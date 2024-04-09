@@ -8,6 +8,7 @@ import 'package:aichat/View/screens/chatHistoryScreen.dart';
 import 'package:aichat/View/screens/chatScreen.dart';
 import 'package:aichat/View/screens/profileScreen.dart';
 
+
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
@@ -41,6 +42,8 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: currentIndex,
+        elevation: 0,
+        selectedItemColor: Theme.of(context).colorScheme.primary,
         onTap: (index) {
           setState(() {
             currentIndex = index;

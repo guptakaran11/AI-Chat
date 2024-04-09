@@ -1,5 +1,9 @@
-import 'package:aichat/View/screens/homePage.dart';
+
+//* Packages 
 import 'package:flutter/material.dart';
+
+//* Screens
+import 'package:aichat/View/screens/homePage.dart';
 
 void main() {
   runApp(const MyApp());
