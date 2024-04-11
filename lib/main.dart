@@ -1,12 +1,27 @@
-
-//* Packages 
+//* Packages
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+//* Providers
+import 'package:aichat/Controller/provider/chatProvider.dart';
 
 //* Screens
 import 'package:aichat/View/screens/homePage.dart';
 
-void main() {
-  runApp(const MyApp());
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await ChatProvider.initHive();
+
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider<ChatProvider>(
+          create: (_) => ChatProvider(),
+        ),
+      ],
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -15,13 +30,12 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
-      ),
-      home: const HomeScreen()
-    );
+        debugShowCheckedModeBanner: false,
+        title: 'AI Chat',
+        theme: ThemeData(
+          colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+          useMaterial3: true,
+        ),
+        home: const HomeScreen());
   }
 }
