@@ -6,7 +6,7 @@ import 'package:provider/provider.dart';
 import 'package:aichat/Controller/provider/chatProvider.dart';
 
 //* Screens
-import 'package:aichat/View/screens/homePage.dart';
+import 'package:aichat/View/homePage.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

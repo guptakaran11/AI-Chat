@@ -4,10 +4,9 @@
 import 'package:flutter/material.dart';
 
 //* Screens
-import 'package:aichat/View/screens/chatHistoryScreen.dart';
-import 'package:aichat/View/screens/chatScreen.dart';
-import 'package:aichat/View/screens/profileScreen.dart';
-
+import '../../View/screens/chatHistoryScreen.dart';
+import '../../View/screens/chatScreen.dart';
+import '../../View/screens/profileScreen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -60,7 +59,7 @@ class _HomeScreenState extends State<HomeScreen> {
             label: "Chat ",
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.person),
+            icon: Icon(Icons.account_circle_rounded),
             label: "Profile",
           ),
         ],
