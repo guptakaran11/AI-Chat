@@ -11,6 +11,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:path_provider/path_provider.dart' as path;
 import 'package:image_picker/image_picker.dart';
 import 'package:google_generative_ai/google_generative_ai.dart';
+import 'package:uuid/uuid.dart';
 
 //* Models
 import '../../Model/userModel.dart';
@@ -120,6 +121,85 @@ class ChatProvider extends ChangeNotifier {
   void setLoading(bool value) {
     isLoading = value;
     notifyListeners();
+  }
+
+  Future<void> sentMessage(String message, bool isTextOnly) async {
+    await setModel(isTextOnly);
+
+    setLoading(true);
+    String chatId = getChatID();
+    List<Content> history = [];
+
+    history = await getHistory(chatId);
+    List<String> imagesUrls = getImageUrl(isTextOnly);
+
+    final userMessage = MessageModel(
+      messageId: "",
+      chatId: chatId,
+      role: Role.user,
+      message: StringBuffer(message),
+      imageUrls: imagesUrls,
+      timeSent: DateTime.now(),
+    );
+
+    inChatMessages.add(userMessage);
+    notifyListeners();
+
+    if (currentChatIds.isEmpty) {
+      setCurrentChatID(chatId);
+    }
+
+    // await sendMessageAndWaitForResponse(
+    //   message: message,
+    //   chatId: chatId,
+    //   isTextOnly: isTextOnly,
+    //   history:history,
+    //   userMessage: userMessage,
+    // );
+  }
+
+  List<String> getImageUrl(bool isTextOnly) {
+    List<String> imagesUrls = [];
+    if (!isTextOnly && imagesFileLists != null) {
+      for (var image in imagesFileLists!) {
+        imagesUrls.add(image.path);
+      }
+    }
+    return imagesUrls;
+  }
+
+  Future<List<Content>> getHistory(String chatId) async {
+    List<Content> history = [];
+    if (currentChatIds.isEmpty) {
+      await setInChatMessages(chatId);
+
+      for (var message in inChatMessage) {
+        if (message.role == Role.user) {
+          history.add(
+            Content.text(
+              message.message.toString(),
+            ),
+          );
+        } else {
+          history.add(
+            Content.model(
+              [
+                TextPart(message.message.toString()),
+              ],
+            ),
+          );
+        }
+      }
+    }
+    return history;
+  }
+
+  String getChatID() {
+    if (currentChatIds.isEmpty) {
+      return const Uuid().v4();
+    } else {
+      return currentChatIds;
+    }
   }
 
   // init Hive Box
