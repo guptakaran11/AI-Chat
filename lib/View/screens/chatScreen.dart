@@ -68,7 +68,6 @@ class _ChatScreenState extends State<ChatScreen> {
                           ),
                   ),
                   BottomChatField(
-                    key: UniqueKey(),
                     chatProvider: chatProvider,
                   ),
                 ],
