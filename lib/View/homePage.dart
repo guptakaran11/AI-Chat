@@ -29,7 +29,6 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(),
       body: PageView(
         controller: pageController,
         children: screens,
