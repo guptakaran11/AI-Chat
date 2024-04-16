@@ -3,6 +3,7 @@
 //* Dart Packages
 import 'dart:async';
 import 'dart:developer';
+import 'dart:typed_data';
 
 //* Packages
 import 'package:flutter/material.dart';
@@ -123,16 +124,25 @@ class ChatProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+// send message to gemini and get the stream response
   Future<void> sentMessage(String message, bool isTextOnly) async {
     await setModel(isTextOnly);
 
     setLoading(true);
+
+    // get the chatId
     String chatId = getChatID();
+
+    // get the list of history messsage
     List<Content> history = [];
 
+  // get the chat History
     history = await getHistory(chatId);
+
+    // get the image Urls
     List<String> imagesUrls = getImageUrl(isTextOnly);
 
+  // userMessage
     final userMessage = MessageModel(
       messageId: "",
       chatId: chatId,
@@ -142,6 +152,7 @@ class ChatProvider extends ChangeNotifier {
       timeSent: DateTime.now(),
     );
 
+// add this message to the list on inChatMessages
     inChatMessages.add(userMessage);
     notifyListeners();
 
@@ -149,13 +160,98 @@ class ChatProvider extends ChangeNotifier {
       setCurrentChatID(chatId);
     }
 
-    // await sendMessageAndWaitForResponse(
-    //   message: message,
-    //   chatId: chatId,
-    //   isTextOnly: isTextOnly,
-    //   history:history,
-    //   userMessage: userMessage,
-    // );
+// send message to the model and wait for the response
+    await sendMessageAndWaitForResponse(
+      message: message,
+      chatId: chatId,
+      isTextOnly: isTextOnly,
+      history: history,
+      userMessage: userMessage,
+    );
+  }
+
+  Future<void> sendMessageAndWaitForResponse({
+    required String message,
+    required String chatId,
+    required bool isTextOnly,
+    required List<Content> history,
+    required MessageModel userMessage,
+  }) async {
+
+    // start the chat Session- only send history is its text-only
+    final chatSession = model!
+        .startChat(history: history.isEmpty || !isTextOnly ? null : history);
+
+    // getContent
+    final content = await getContent(
+      message: message,
+      isTextOnly: isTextOnly,
+    );
+
+    // assistant message
+    final assistantMessage = userMessage.copyWith(
+      messageId: '',
+      role: Role.assistant,
+      message: StringBuffer(),
+      timeSent: DateTime.now(),
+    );
+
+    // add this message to the list on inChatMessages
+    inChatMessages.add(assistantMessage);
+    notifyListeners();
+
+    // wait for the Stream message response
+    chatSession.sendMessageStream(content).asyncMap((event) {
+      return event;
+    }).listen((event) {
+      inChatMessages
+          .firstWhere((element) =>
+              element.messageId == assistantMessage.messageId &&
+              element.role == Role.assistant)
+          .message
+          .write(event.text);
+      notifyListeners();
+    }, onDone: () {
+      // save message to the hive db
+
+      // set loading to false
+      setLoading(false);
+    }).onError((error, stackTrace) {
+      // set loading
+      setLoading(false);
+    });
+  }
+
+  Future<Content> getContent({
+    required message,
+    required bool isTextOnly,
+  }) async {
+    if (isTextOnly) {
+      // generate text from text-only input
+      return Content.text(message);
+    } else {
+      // generate image from text and image input
+      final imageFutures = imagesFileList
+          ?.map(
+            (imageFile) => imageFile.readAsBytes(),
+          )
+          .toList(growable: false);
+
+      final imageBytes = await Future.wait(imageFutures!);
+      final prompt = TextPart(message);
+      final imageParts = imageBytes
+          .map(
+            (bytes) => DataPart(
+              'image/jpg',
+              Uint8List.fromList(
+                bytes,
+              ),
+            ),
+          )
+          .toList();
+
+      return Content.model([prompt, ...imageParts]);
+    }
   }
 
   List<String> getImageUrl(bool isTextOnly) {
