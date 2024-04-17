@@ -136,15 +136,18 @@ class ChatProvider extends ChangeNotifier {
     // get the list of history messsage
     List<Content> history = [];
 
-  // get the chat History
+    // get the chat History
     history = await getHistory(chatId);
 
     // get the image Urls
     List<String> imagesUrls = getImageUrl(isTextOnly);
 
-  // userMessage
+    // user messageId
+    final userMessageId = const Uuid().v4();
+
+    // userMessage
     final userMessage = MessageModel(
-      messageId: "",
+      messageId: userMessageId,
       chatId: chatId,
       role: Role.user,
       message: StringBuffer(message),
@@ -177,7 +180,6 @@ class ChatProvider extends ChangeNotifier {
     required List<Content> history,
     required MessageModel userMessage,
   }) async {
-
     // start the chat Session- only send history is its text-only
     final chatSession = model!
         .startChat(history: history.isEmpty || !isTextOnly ? null : history);
@@ -188,9 +190,12 @@ class ChatProvider extends ChangeNotifier {
       isTextOnly: isTextOnly,
     );
 
+    // assistant messageId
+    final modelMesssageId = const Uuid().v4();
+
     // assistant message
     final assistantMessage = userMessage.copyWith(
-      messageId: '',
+      messageId: modelMesssageId,
       role: Role.assistant,
       message: StringBuffer(),
       timeSent: DateTime.now(),
@@ -207,7 +212,7 @@ class ChatProvider extends ChangeNotifier {
       inChatMessages
           .firstWhere((element) =>
               element.messageId == assistantMessage.messageId &&
-              element.role == Role.assistant)
+              element.role.name == Role.assistant.name)
           .message
           .write(event.text);
       notifyListeners();
