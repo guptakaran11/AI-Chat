@@ -247,7 +247,7 @@ class ChatProvider extends ChangeNotifier {
       final imageParts = imageBytes
           .map(
             (bytes) => DataPart(
-              'image/jpg',
+              'image/jpeg',
               Uint8List.fromList(
                 bytes,
               ),
@@ -255,7 +255,7 @@ class ChatProvider extends ChangeNotifier {
           )
           .toList();
 
-      return Content.model([prompt, ...imageParts]);
+      return Content.multi([prompt, ...imageParts]);
     }
   }
 

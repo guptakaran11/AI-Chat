@@ -5,6 +5,9 @@ import 'package:flutter_markdown/flutter_markdown.dart';
 //* Models
 import '../../Model/messageModel.dart';
 
+//* Widgets
+import '../Widgets/preview_image_widget.dart';
+
 class MessageWidget extends StatelessWidget {
   final MessageModel message;
   const MessageWidget({
@@ -26,9 +29,19 @@ class MessageWidget extends StatelessWidget {
         ),
         padding: const EdgeInsets.all(15),
         margin: const EdgeInsets.only(bottom: 8),
-        child: MarkdownBody(
-          data: message.message.toString(),
-          selectable: true,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            if (message.imageUrls.isNotEmpty)
+              PreviewImage(
+                message: message,
+              ),
+            MarkdownBody(
+              data: message.message.toString(),
+              selectable: true,
+            ),
+          ],
         ),
       ),
     );

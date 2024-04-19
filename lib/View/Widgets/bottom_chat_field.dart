@@ -11,6 +11,9 @@ import 'package:aichat/Controller/provider/chatProvider.dart';
 //* Widgets
 import '../Widgets/preview_image_widget.dart';
 
+//* Utilities
+import '../utilities/utility.dart';
+
 class BottomChatField extends StatefulWidget {
   final ChatProvider chatProvider;
 
@@ -50,6 +53,7 @@ class _BottomChatFieldState extends State<BottomChatField> {
       log(e.toString());
     } finally {
       textController.clear();
+      widget.chatProvider.setImageFileList([]);
       textFieldFocus.unfocus();
     }
   }
@@ -84,14 +88,24 @@ class _BottomChatFieldState extends State<BottomChatField> {
       ),
       child: Column(
         children: [
+          if (hasImages) const PreviewImage(),
           Row(
             children: [
-              if (hasImages) const PreviewImage(),
               IconButton(
                 onPressed: () {
                   if (hasImages) {
                     // show the delete dialog box
-                    widget.chatProvider.setImageFileList([]);
+                    showAnimatedDialog(
+                      context: context,
+                      title: "Delete Images",
+                      content: "Are you sure you want to delete the images?",
+                      actionText: "Delete",
+                      onActionPressed: (value) {
+                        if (value) {
+                          widget.chatProvider.setImageFileList([]);
+                        }
+                      },
+                    );
                   } else {
                     pickImage();
                   }
@@ -113,7 +127,7 @@ class _BottomChatFieldState extends State<BottomChatField> {
                       sendChatMessage(
                         message: textController.text,
                         chatProvider: widget.chatProvider,
-                        isTextOnly: true,
+                        isTextOnly: hasImages ? false : true,
                       );
                     }
                   },
@@ -133,7 +147,7 @@ class _BottomChatFieldState extends State<BottomChatField> {
                     sendChatMessage(
                       message: textController.text,
                       chatProvider: widget.chatProvider,
-                      isTextOnly: true,
+                      isTextOnly: hasImages ? false : true,
                     );
                   }
                 },
