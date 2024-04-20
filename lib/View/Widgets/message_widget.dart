@@ -30,13 +30,16 @@ class MessageWidget extends StatelessWidget {
         padding: const EdgeInsets.all(15),
         margin: const EdgeInsets.only(bottom: 8),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             if (message.imageUrls.isNotEmpty)
               PreviewImage(
                 message: message,
               ),
+            // const SizedBox(
+            //   height: 5,
+            // ),
             MarkdownBody(
               data: message.message.toString(),
               selectable: true,
