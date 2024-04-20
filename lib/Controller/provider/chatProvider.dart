@@ -22,6 +22,7 @@ import '../../Model/messageModel.dart';
 import '../../Controller/Services/HiveStorage/chatHistoryStorage.dart';
 import '../../Controller/Services/HiveStorage/setting.dart';
 import '../../Controller/Services/Apis/api.dart';
+import '../../Controller/Services/HiveStorage/boxes.dart';
 
 //* Widgets
 import '../../View/Widgets/constants.dart';
@@ -216,8 +217,13 @@ class ChatProvider extends ChangeNotifier {
           .message
           .write(event.text);
       notifyListeners();
-    }, onDone: () {
+    }, onDone: () async {
       // save message to the hive db
+      await saveMessageToDB(
+        chatID: chatId,
+        userMessage: userMessage,
+        assistantMessage: assistantMessage,
+      );
 
       // set loading to false
       setLoading(false);
@@ -225,6 +231,40 @@ class ChatProvider extends ChangeNotifier {
       // set loading
       setLoading(false);
     });
+  }
+
+  // save message to hive db
+  Future<void> saveMessageToDB({
+    required String chatID,
+    required MessageModel userMessage,
+    required MessageModel assistantMessage,
+  }) async {
+    // open the messge box
+    final messageBox = await Hive.openBox("${Constants.chatMessageBox}$chatID");
+
+    // save the user messages
+    await messageBox.put(userMessage.messageId, userMessage.toMap());
+
+    // save the assistant messages
+    await messageBox.put(assistantMessage.messageId, assistantMessage.toMap());
+
+    // save chatHistory with same chatId
+    // if its already there update it
+    // if not create new one
+
+    final chatHistoryBox = Boxes.getChatHistory();
+
+    final chatHistory = ChatHistoryStorage(
+      chatId: chatID,
+      prompt: userMessage.message.toString(),
+      response: assistantMessage.message.toString(),
+      imageURL: userMessage.imageUrls,
+      timestamp: DateTime.now(),
+    );
+    await chatHistoryBox.put(chatID, chatHistory);
+
+    // close the box
+    await messageBox.close();
   }
 
   Future<Content> getContent({

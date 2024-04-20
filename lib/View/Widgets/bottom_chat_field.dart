@@ -122,15 +122,17 @@ class _BottomChatFieldState extends State<BottomChatField> {
                   focusNode: textFieldFocus,
                   controller: textController,
                   textInputAction: TextInputAction.send,
-                  onSubmitted: (value) {
-                    if (value.isNotEmpty) {
-                      sendChatMessage(
-                        message: textController.text,
-                        chatProvider: widget.chatProvider,
-                        isTextOnly: hasImages ? false : true,
-                      );
-                    }
-                  },
+                  onSubmitted: widget.chatProvider.isLoading
+                      ? null
+                      : (value) {
+                          if (value.isNotEmpty) {
+                            sendChatMessage(
+                              message: textController.text,
+                              chatProvider: widget.chatProvider,
+                              isTextOnly: hasImages ? false : true,
+                            );
+                          }
+                        },
                   decoration: InputDecoration(
                     hintText: "Enter a prompt...",
                     border: OutlineInputBorder(
@@ -141,16 +143,18 @@ class _BottomChatFieldState extends State<BottomChatField> {
                 ),
               ),
               GestureDetector(
-                onTap: () {
-                  // send Chat message
-                  if (textController.text.isNotEmpty) {
-                    sendChatMessage(
-                      message: textController.text,
-                      chatProvider: widget.chatProvider,
-                      isTextOnly: hasImages ? false : true,
-                    );
-                  }
-                },
+                onTap: widget.chatProvider.isLoading
+                    ? null
+                    : () {
+                        // send Chat message
+                        if (textController.text.isNotEmpty) {
+                          sendChatMessage(
+                            message: textController.text,
+                            chatProvider: widget.chatProvider,
+                            isTextOnly: hasImages ? false : true,
+                          );
+                        }
+                      },
                 child: Container(
                   decoration: BoxDecoration(
                     color: Colors.deepPurple,

@@ -37,9 +37,6 @@ class MessageWidget extends StatelessWidget {
               PreviewImage(
                 message: message,
               ),
-            // const SizedBox(
-            //   height: 5,
-            // ),
             MarkdownBody(
               data: message.message.toString(),
               selectable: true,
