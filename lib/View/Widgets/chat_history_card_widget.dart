@@ -44,7 +44,7 @@ class ChatHistoryCard extends StatelessWidget {
           showAnimatedDialog(
             context: context,
             title: "Delete Chat",
-            content: "Are you sure you want to delete the images?",
+            content: "Are you sure you want to delete the Chat?",
             actionText: "Delete",
             onActionPressed: (value) {
               if (value) {
