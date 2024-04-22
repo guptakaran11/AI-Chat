@@ -27,6 +27,8 @@ import '../../Controller/Services/HiveStorage/boxes.dart';
 //* Widgets
 import '../../View/Widgets/constants.dart';
 
+//* Utilities
+
 class ChatProvider extends ChangeNotifier {
   List<MessageModel> inChatMessages = [];
 
