@@ -1,11 +1,15 @@
 //* Packages
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 //* Services
 import '../../Controller/Services/HiveStorage/chatHistoryStorage.dart';
 
 //* Utilities
 import '../utilities/utility.dart';
+
+//* Providers
+import '../../Controller/provider/chatProvider.dart';
 
 class ChatHistoryCard extends StatelessWidget {
   const ChatHistoryCard({
@@ -36,8 +40,16 @@ class ChatHistoryCard extends StatelessWidget {
           maxLines: 2,
         ),
         trailing: const Icon(Icons.arrow_forward_ios),
-        onTap: () {
+        onTap: () async {
           // naviagate to chat screen
+          final chatProvider = context.read<ChatProvider>();
+          // Load the content
+          // await chatProvider.prepareChatRoom(
+          //   isNewChat: false,
+          //   chatID: chat.chatId,
+          // );
+          chatProvider.setCurrentIndex(1);
+          chatProvider.pageController.jumpToPage(1);
         },
         onLongPress: () {
           // show my animated dialog to delete the chat

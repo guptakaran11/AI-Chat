@@ -27,9 +27,8 @@ import '../../Controller/Services/HiveStorage/boxes.dart';
 //* Widgets
 import '../../View/Widgets/constants.dart';
 
-
 class ChatProvider extends ChangeNotifier {
-  List<MessageModel> inChatMessages = [];
+  final List<MessageModel> inChatMessages = [];
 
   final PageController controller = PageController();
 
@@ -124,6 +123,33 @@ class ChatProvider extends ChangeNotifier {
   void setLoading(bool value) {
     isLoading = value;
     notifyListeners();
+  }
+
+  // Prepare the chat for the loading
+  Future<void> prepareChatRoom({
+    required bool isNewChat,
+    required String chatID,
+  }) async {
+    if (!isNewChat) {
+      // 1. load the chat message from the data base
+      final chatHistory = await loadMessagesFromDB(chatID);
+
+      //2.  clear the inChatMessages
+      inChatMessages.clear();
+
+      for (var message in chatHistory) {
+        inChatMessages.add(message);
+      }
+
+      // 3. Set the current chat Id
+      setCurrentChatID(chatID);
+    } else {
+      // 1. clear inChatmessages
+      inChatMessages.clear();
+
+      // 2.set the current chat Id
+      setCurrentChatID(chatID);
+    }
   }
 
 // send message to gemini and get the stream response

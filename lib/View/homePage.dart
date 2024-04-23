@@ -2,11 +2,15 @@
 
 //* Packages
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 //* Screens
 import '../../View/screens/chatHistoryScreen.dart';
 import '../../View/screens/chatScreen.dart';
 import '../../View/screens/profileScreen.dart';
+
+//* Providers
+import '../Controller/provider/chatProvider.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -16,9 +20,6 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  final PageController pageController = PageController();
-  int currentIndex = 0;
-
   // List of Screens
   final List<Widget> screens = [
     const ChatHistoryScreen(),
@@ -28,41 +29,41 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: PageView(
-        controller: pageController,
-        children: screens,
-        onPageChanged: (index) {
-          setState(() {
-            currentIndex = index;
-          });
-        },
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: currentIndex,
-        elevation: 0,
-        selectedItemColor: Theme.of(context).colorScheme.primary,
-        onTap: (index) {
-          setState(() {
-            currentIndex = index;
-          });
-          pageController.jumpToPage(index);
-        },
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.history),
-            label: "Chat History",
+    return Consumer<ChatProvider>(
+      builder: (context, chatProvider, child) {
+        return Scaffold(
+          body: PageView(
+            controller: chatProvider.pageController,
+            children: screens,
+            onPageChanged: (index) {
+              chatProvider.setCurrentIndex(index);
+            },
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.chat),
-            label: "Chat ",
+          bottomNavigationBar: BottomNavigationBar(
+            currentIndex: chatProvider.currentIndex,
+            elevation: 0,
+            selectedItemColor: Theme.of(context).colorScheme.primary,
+            onTap: (index) {
+              chatProvider.setCurrentIndex(index);
+              chatProvider.pageController.jumpToPage(index);
+            },
+            items: const [
+              BottomNavigationBarItem(
+                icon: Icon(Icons.history),
+                label: "Chat History",
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(Icons.chat),
+                label: "Chat ",
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(Icons.account_circle_rounded),
+                label: "Profile",
+              ),
+            ],
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.account_circle_rounded),
-            label: "Profile",
-          ),
-        ],
-      ),
+        );
+      },
     );
   }
 }
