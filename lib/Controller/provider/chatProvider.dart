@@ -125,6 +125,38 @@ class ChatProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  // delete chat
+  Future<void> deletChatMessages({required String chatId}) async {
+    // 1. check if the box is open
+    if (!Hive.isBoxOpen('${Constants.chatMessageBox}$chatId')) {
+      // open the box
+      await Hive.openBox('${Constants.chatMessageBox}$chatId');
+
+      // delete all messages in the box
+      await Hive.box('${Constants.chatMessageBox}$chatId').clear();
+
+      // close the box
+      await Hive.box('${Constants.chatMessageBox}$chatId').close();
+    } else {
+      // delete all messages in the box
+      await Hive.box('${Constants.chatMessageBox}$chatId').clear();
+
+      // close the box
+      await Hive.box('${Constants.chatMessageBox}$chatId').close();
+    }
+
+    // get the current chatId, its its not empty
+    // we check if its the same as the chatId
+    // if its the same we set it to empty
+    if (currentChatId.isNotEmpty) {
+      if (currentChatId == chatId) {
+        setCurrentChatID("");
+        inChatMessages.clear();
+        notifyListeners();
+      }
+    }
+  }
+
   // Prepare the chat for the loading
   Future<void> prepareChatRoom({
     required bool isNewChat,
@@ -170,12 +202,23 @@ class ChatProvider extends ChangeNotifier {
     // get the image Urls
     List<String> imagesUrls = getImageUrl(isTextOnly);
 
-    // user messageId
-    final userMessageId = const Uuid().v4();
+    // open the messge box
+    final messageBox = await Hive.openBox("${Constants.chatMessageBox}$chatId");
+
+    log("messageLength:  ${messageBox.keys.length}");
+
+    // get the last user message
+    final userMessageId = messageBox.keys.length;
+
+    // get the last assiatant  message
+    final assistantMessageId = messageBox.keys.length + 1;
+
+    log("messageuserId: ${userMessageId.toString()}");
+    log("model: ${assistantMessageId.toString()}");
 
     // userMessage
     final userMessage = MessageModel(
-      messageId: userMessageId,
+      messageId: userMessageId.toString(),
       chatId: chatId,
       role: Role.user,
       message: StringBuffer(message),
@@ -198,6 +241,8 @@ class ChatProvider extends ChangeNotifier {
       isTextOnly: isTextOnly,
       history: history,
       userMessage: userMessage,
+      modelMessageId: assistantMessageId.toString(),
+      messageBox: messageBox,
     );
   }
 
@@ -207,6 +252,8 @@ class ChatProvider extends ChangeNotifier {
     required bool isTextOnly,
     required List<Content> history,
     required MessageModel userMessage,
+    required String modelMessageId,
+    required Box messageBox,
   }) async {
     // start the chat Session- only send history is its text-only
     final chatSession = model!
@@ -250,6 +297,7 @@ class ChatProvider extends ChangeNotifier {
         chatID: chatId,
         userMessage: userMessage,
         assistantMessage: assistantMessage,
+        messageBox: messageBox,
       );
 
       // set loading to false
@@ -265,15 +313,13 @@ class ChatProvider extends ChangeNotifier {
     required String chatID,
     required MessageModel userMessage,
     required MessageModel assistantMessage,
+    required Box messageBox,
   }) async {
-    // open the messge box
-    final messageBox = await Hive.openBox("${Constants.chatMessageBox}$chatID");
-
     // save the user messages
-    await messageBox.put(userMessage.messageId, userMessage.toMap());
+    await messageBox.add(userMessage.toMap());
 
     // save the assistant messages
-    await messageBox.put(assistantMessage.messageId, assistantMessage.toMap());
+    await messageBox.add(assistantMessage.toMap());
 
     // save chatHistory with same chatId
     // if its already there update it

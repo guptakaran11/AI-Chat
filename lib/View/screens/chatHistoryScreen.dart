@@ -31,7 +31,8 @@ class _ChatHistoryScreenState extends State<ChatHistoryScreen> {
       body: ValueListenableBuilder<Box<ChatHistoryStorage>>(
         valueListenable: Boxes.getChatHistory().listenable(),
         builder: (context, box, _) {
-          final chatHistory = box.values.toList().cast<ChatHistoryStorage>();
+          final chatHistory =
+              box.values.toList().cast<ChatHistoryStorage>().reversed.toList();
           return chatHistory.isEmpty
               ? const EmptyHistoryWidget()
               : Padding(

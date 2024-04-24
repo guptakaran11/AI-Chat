@@ -12,6 +12,9 @@ import '../../Controller/provider/chatProvider.dart';
 import '../Widgets/bottom_chat_field.dart';
 import '../Widgets/chat_message.dart';
 
+//* Utilities
+import '../utilities/utility.dart';
+
 class ChatScreen extends StatefulWidget {
   const ChatScreen({super.key});
 
@@ -66,6 +69,33 @@ class _ChatScreenState extends State<ChatScreen> {
             title: const Text(
               "Chat with AI",
             ),
+            actions: [
+              if (chatProvider.inChatMessages.isNotEmpty)
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: CircleAvatar(
+                    child: IconButton(
+                      onPressed: () async {
+                        showAnimatedDialog(
+                          context: context,
+                          title: "Start New Chat",
+                          content: "Are you sure to start a new chat?",
+                          actionText: "Yes",
+                          onActionPressed: (value) async {
+                            if (value) {
+                              await chatProvider.prepareChatRoom(
+                                isNewChat: true,
+                                chatID: "",
+                              );
+                            }
+                          },
+                        );
+                      },
+                      icon: const Icon(Icons.add),
+                    ),
+                  ),
+                ),
+            ],
           ),
           body: SafeArea(
             child: Padding(

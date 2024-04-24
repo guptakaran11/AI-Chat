@@ -34,7 +34,7 @@ class MessageModel {
       messageId: map['messageId'] as String,
       chatId: map['chatId'] as String,
       role: Role.values[map['role']],
-      message: StringBuffer(map['message'] as Map<String, dynamic>),
+      message: StringBuffer(map['message']),
       imageUrls: List<String>.from((map['imageUrls'] as List<String>)),
       timeSent: DateTime.parse(
         map['timeSent'],
@@ -45,7 +45,7 @@ class MessageModel {
   // String toJson() => json.encode(toMap());
 
   // factory MessageModel.fromJson(String source) =>
-  //     MessageModel.fromMap(json.decode(source) as Map<String, dynamic>); 
+  //     MessageModel.fromMap(json.decode(source) as Map<String, dynamic>);
 
   MessageModel copyWith({
     String? messageId,

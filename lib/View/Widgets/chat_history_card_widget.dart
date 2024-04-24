@@ -44,10 +44,10 @@ class ChatHistoryCard extends StatelessWidget {
           // naviagate to chat screen
           final chatProvider = context.read<ChatProvider>();
           // Load the content
-          // await chatProvider.prepareChatRoom(
-          //   isNewChat: false,
-          //   chatID: chat.chatId,
-          // );
+          await chatProvider.prepareChatRoom(
+            isNewChat: false,
+            chatID: chat.chatId,
+          );
           chatProvider.setCurrentIndex(1);
           chatProvider.pageController.jumpToPage(1);
         },
@@ -58,9 +58,14 @@ class ChatHistoryCard extends StatelessWidget {
             title: "Delete Chat",
             content: "Are you sure you want to delete the Chat?",
             actionText: "Delete",
-            onActionPressed: (value) {
+            onActionPressed: (value) async {
               if (value) {
                 // delete the chat
+                await context.read<ChatProvider>().deletChatMessages(
+                      chatId: chat.chatId,
+                    );
+                // delete the chat History
+                await chat.delete();
               }
             },
           );
