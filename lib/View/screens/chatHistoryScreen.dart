@@ -12,6 +12,9 @@ import '../../Controller/Services/HiveStorage/boxes.dart';
 import '../Widgets/chat_history_card_widget.dart';
 import '../Widgets/empty_history_widget.dart';
 
+//* Utilities
+import "../utilities/utility.dart";
+
 class ChatHistoryScreen extends StatefulWidget {
   const ChatHistoryScreen({super.key});
 
