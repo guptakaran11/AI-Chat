@@ -265,10 +265,10 @@ class ChatProvider extends ChangeNotifier {
       isTextOnly: isTextOnly,
     );
 
-    // assistant messageId
+      // assistant messageId
     final modelMesssageId = const Uuid().v4();
 
-    // assistant message
+      // assistant message
     final assistantMessage = userMessage.copyWith(
       messageId: modelMesssageId,
       role: Role.assistant,
@@ -276,11 +276,11 @@ class ChatProvider extends ChangeNotifier {
       timeSent: DateTime.now(),
     );
 
-    // add this message to the list on inChatMessages
+      // add this message to the list on inChatMessages
     inChatMessages.add(assistantMessage);
     notifyListeners();
 
-    // wait for the Stream message response
+      // wait for the Stream message response
     chatSession.sendMessageStream(content).asyncMap((event) {
       return event;
     }).listen((event) {
