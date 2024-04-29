@@ -226,7 +226,7 @@ class ChatProvider extends ChangeNotifier {
       timeSent: DateTime.now(),
     );
 
-// add this message to the list on inChatMessages
+  // add this message to the list on inChatMessages
     inChatMessages.add(userMessage);
     notifyListeners();
 
@@ -234,7 +234,7 @@ class ChatProvider extends ChangeNotifier {
       setCurrentChatID(chatId);
     }
 
-// send message to the model and wait for the response
+  // send message to the model and wait for the response
     await sendMessageAndWaitForResponse(
       message: message,
       chatId: chatId,
