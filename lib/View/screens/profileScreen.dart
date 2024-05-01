@@ -8,13 +8,16 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:provider/provider.dart';
 
 //* Services
 import '../../Controller/Services/HiveStorage/boxes.dart';
 import '../../Controller/Services/HiveStorage/setting.dart';
+import '../../Controller/provider/settings_provider.dart';
 
 //* Widgets
 import '../Widgets/display_image.dart';
+import '../Widgets/settings_tile.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -83,6 +86,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
           IconButton(
             onPressed: () {
               // save the data
+              // this is not tested
+              final settingProvider = context.read<SettingsProvider>();
+              settingProvider.getSavedSettings();
             },
             icon: const Icon(Icons.check_rounded),
           ),
@@ -123,16 +129,33 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     return Column(
                       children: [
                         // Ai voice
-                        SwitchListTile(
-                          title: const Text('Enable Ai Voice'),
+                        SettingTile(
+                          icon: Icons.mic,
+                          title: "Enable AI voice",
                           value: false,
-                          onChanged: (value) {},
+                          onChanged: (value) {
+                            final settingProvider =
+                                context.read<SettingsProvider>();
+                            settingProvider.toggleSpeak(
+                              value: value,
+                            );
+                          },
+                        ),
+                        const SizedBox(
+                          height: 15.0,
                         ),
                         // Theme
-                        SwitchListTile(
-                          title: const Text('Theme'),
+                        SettingTile(
+                          icon: Icons.light_mode,
+                          title: "Theme",
                           value: false,
-                          onChanged: (value) {},
+                          onChanged: (value) {
+                            final settingProvider =
+                                context.read<SettingsProvider>();
+                            settingProvider.toggleDarkMode(
+                              value: value,
+                            );
+                          },
                         ),
                       ],
                     );
@@ -140,13 +163,35 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     final settings = box.getAt(0);
                     return Column(
                       children: [
-                        // dark mode
-                        SwitchListTile(
-                          title: const Text('Dark Mode'),
-                          value: settings!.isDarkTheme,
+                        // Ai voice
+                        SettingTile(
+                          icon: Icons.mic,
+                          title: "Enable AI voice",
+                          value: settings!.shouldSpeak,
                           onChanged: (value) {
-                            settings.isDarkTheme = value;
-                            settings.save();
+                            final settingProvider =
+                                context.read<SettingsProvider>();
+                            settingProvider.toggleSpeak(
+                              value: value,
+                            );
+                          },
+                        ),
+                        const SizedBox(
+                          height: 15.0,
+                        ),
+                        // Theme
+                        SettingTile(
+                          icon: settings.isDarkTheme
+                              ? Icons.dark_mode
+                              : Icons.light_mode,
+                          title: "Theme",
+                          value: settings.isDarkTheme,
+                          onChanged: (value) {
+                            final settingProvider =
+                                context.read<SettingsProvider>();
+                            settingProvider.toggleDarkMode(
+                              value: value,
+                            );
                           },
                         ),
                       ],
